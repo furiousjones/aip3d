@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIP3D Web Interface</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #status { margin-top: 20px; }
+        .button { margin: 10px; padding: 10px 20px; cursor: pointer; }
+        .progress { width: 100%; max-width: 300px; margin: 20px auto; }
+    </style>
+</head>
+<body>
+    <h1>AIP3D Web Interface</h1>
+    <div id="status">Status: Not connected</div>
+    <button class="button" onclick="startPrint()">Start Print</button>
+    <button class="button" onclick="pausePrint()">Pause Print</button>
+    <button class="button" onclick="resumePrint()">Resume Print</button>
+    <button class="button" onclick="cancelPrint()">Cancel Print</button>
+    <div class="progress">
+        <progress id="progressBar" value="0" max="100"></progress>
+        <div id="progressText">Progress: 0%</div>
+    </div>
+    <div id="temperature">Temperature: 0°C</div>
+    <div id="error">Error: None</div>
+
+    <script>
+        var socket = io();
+
+        socket.on('connect', function() {
+            document.getElementById('status').innerText = 'Status: Connected';
+            socket.emit('request_status');
+        });
+
+        socket.on('status_update', function(status) {
+            document.getElementById('progressBar').value = status.progress;
+            document.getElementById('progressText').innerText = 'Progress: ' + status.progress + '%';
+            document.getElementById('temperature').innerText = 'Temperature: ' + status.temperature + '°C';
+            document.getElementById('error').innerText = 'Error: ' + (status.error ? status.error : 'None');
+        });
+
+        function startPrint() {
+            fetch('/start_print', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model_file: 'path/to/model.stl' })
+            }).then(response => response.json())
+              .then(data => console.log(data));
+        }
+
+        function pausePrint() {
+            fetch('/pause_print', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => console.log(data));
+        }
+
+        function resumePrint() {
+            fetch('/resume_print', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => console.log(data));
+        }
+
+        function cancelPrint() {
+            fetch('/cancel_print', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => console.log(data));
+        }
+    </script>
+</body>
+</html>

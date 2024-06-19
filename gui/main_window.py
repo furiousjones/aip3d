@@ -167,8 +167,8 @@ class MainWindow:
             self.status_label.config(text="No model loaded")
             return
 
-    
-        ' print'python
+        try:
+            print```python
             job = PrintJob(self.model, self.queue_manager)
             self.queue_manager.add_job(print_job)
             self.update_print_queue()
